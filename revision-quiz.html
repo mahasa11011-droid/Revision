@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>English Grammar Revision Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:     #fff9f0;
+    --accent: #f97316;
+    --purple: #8b5cf6;
+    --green:  #22c55e;
+    --red:    #f43f5e;
+    --yellow: #fbbf24;
+    --blue:   #38bdf8;
+    --ink:    #1e1b4b;
+    --muted:  #7c7a9e;
+    --card:   #ffffff;
+    --border: #ede9fe;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    background-image: radial-gradient(circle at 10% 20%, #fde68a33 0%, transparent 50%),
+                      radial-gradient(circle at 90% 80%, #c4b5fd33 0%, transparent 50%);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #f97316, #ec4899, #8b5cf6);
+    color: #fff;
+    padding: 44px 24px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '✏️ 📚 🌟 ✏️ 📚 🌟 ✏️ 📚';
+    position: absolute;
+    top: 10px; left: 0; right: 0;
+    font-size: 1.1rem;
+    letter-spacing: 16px;
+    opacity: .25;
+    white-space: nowrap;
+  }
+  header h1 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  header p {
+    font-size: .95rem;
+    font-weight: 600;
+    color: rgba(255,255,255,.85);
+    background: rgba(255,255,255,.2);
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 99px;
+    margin-top: 4px;
+  }
+
+  /* ── Progress bar ── */
+  #progress-wrap {
+    background: #ede9fe;
+    height: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-radius: 0 0 4px 4px;
+  }
+  #progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #f97316, #ec4899);
+    width: 0%;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* ── Score pill ── */
+  #score-pill {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 12px 20px;
+    background: var(--card);
+    border-bottom: 2px solid var(--border);
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--muted);
+    position: sticky;
+    top: 8px;
+    z-index: 9;
+    flex-wrap: wrap;
+  }
+  #score-pill .pill {
+    display: flex; align-items: center; gap: 6px;
+    background: #f5f3ff;
+    padding: 5px 14px;
+    border-radius: 99px;
+    font-size: .82rem;
+  }
+  #score-pill .pill.green { background: #dcfce7; color: #15803d; }
+  #score-pill .pill.red   { background: #ffe4e6; color: #be123c; }
+  #score-pill .pill.blue  { background: #e0f2fe; color: #0369a1; }
+
+  /* ── Questions ── */
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 30px 18px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .q-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 20px;
+    transition: box-shadow .2s, transform .2s;
+    position: relative;
+  }
+  .q-card:hover { box-shadow: 0 8px 28px rgba(139,92,246,.12); transform: translateY(-2px); }
+
+  .q-num {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(135deg, #f97316, #ec4899);
+    padding: 3px 12px;
+    border-radius: 99px;
+    margin-bottom: 10px;
+  }
+  .q-text {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+
+  /* Choices */
+  .choices { display: flex; flex-direction: column; gap: 9px; }
+
+  label.choice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border: 2px solid #ede9fe;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: .95rem;
+    font-weight: 600;
+    transition: border-color .15s, background .15s, transform .1s;
+    user-select: none;
+    background: #faf9ff;
+  }
+  label.choice:hover { border-color: var(--purple); background: #f5f3ff; transform: translateX(4px); }
+  label.choice input[type=radio] { display: none; }
+
+  label.choice .dot {
+    width: 20px; height: 20px;
+    border: 2.5px solid #c4b5fd;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .15s, background .15s;
+  }
+  label.choice.selected .dot {
+    border-color: var(--purple);
+    background: var(--purple);
+  }
+  label.choice.selected .dot::after {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  /* Answered states */
+  label.choice.correct-ans  { border-color: var(--green); background: #f0fdf4; }
+  label.choice.correct-ans .dot { border-color: var(--green); background: var(--green); }
+  label.choice.wrong-ans    { border-color: var(--red); background: #fff1f2; }
+  label.choice.wrong-ans .dot   { border-color: var(--red); background: var(--red); }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 12px;
+    font-size: .85rem;
+    font-weight: 700;
+    display: none;
+    gap: 6px;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 10px;
+  }
+  .feedback.show { display: flex; }
+  .feedback.ok  { color: #15803d; background: #dcfce7; }
+  .feedback.bad { color: #be123c; background: #ffe4e6; }
+
+  /* True/False */
+  .tf-wrap { display: flex; gap: 12px; }
+  label.choice.tf { flex: 1; justify-content: center; font-size: 1rem; }
+
+  /* ── Submit ── */
+  #submit-btn {
+    display: block;
+    margin: 36px auto 0;
+    padding: 15px 52px;
+    background: linear-gradient(135deg, #f97316, #ec4899);
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(249,115,22,.35);
+    transition: transform .15s, box-shadow .15s;
+    letter-spacing: .01em;
+  }
+  #submit-btn:hover  { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(249,115,22,.4); }
+  #submit-btn:active { transform: scale(.97); }
+  #submit-btn:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; }
+
+  /* ── Result banner ── */
+  #result-banner {
+    display: none;
+    max-width: 720px;
+    margin: 28px auto 0;
+    padding: 36px 28px;
+    background: linear-gradient(135deg, #fff7ed, #fdf4ff);
+    border: 2px solid #fde8d8;
+    border-radius: 22px;
+    text-align: center;
+  }
+  #result-banner .emoji { font-size: 3.5rem; line-height: 1; margin-bottom: 10px; }
+  #result-banner h2 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 2rem;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  #result-banner p { color: var(--muted); font-size: .95rem; font-weight: 600; }
+  #result-banner .big-score {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 4rem;
+    line-height: 1;
+    background: linear-gradient(135deg, #f97316, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 18px 0 10px;
+  }
+
+  #retry-btn {
+    margin-top: 20px;
+    padding: 12px 40px;
+    background: linear-gradient(135deg, #8b5cf6, #38bdf8);
+    border: none;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: .95rem;
+    box-shadow: 0 4px 16px rgba(139,92,246,.3);
+    transition: transform .15s, box-shadow .15s;
+  }
+  #retry-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,92,246,.4); }
+
+  @keyframes pop { 0%{transform:scale(.8);opacity:0} 70%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+  .feedback.show { animation: pop .25s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>English Grammar Revision</h1>
+  <p>30 questions &nbsp;·&nbsp; 1 point each &nbsp;·&nbsp; Choose the best answer</p>
+</header>
+
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+
+<div id="score-pill">
+  <div class="pill blue">📝 Answered: <span id="ans-count">0</span> / 30</div>
+  <div class="pill green">✅ Correct: <span id="correct-count">0</span></div>
+  <div class="pill red">❌ Wrong: <span id="wrong-count">0</span></div>
+</div>
+
+<main id="quiz-body"></main>
+
+<button id="submit-btn" disabled>Submit Quiz</button>
+
+<div id="result-banner">
+  <div class="emoji" id="result-emoji">🌟</div>
+  <h2>Quiz Complete!</h2>
+  <div class="big-score" id="final-score"></div>
+  <p id="final-msg"></p>
+  <button id="retry-btn">🔄 Try Again</button>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "The wallet could ……….. been stolen.",
+    choices: ["has","have","had"],
+    answer: "have"
+  },
+  {
+    q: "You should have ………… them about it.",
+    choices: ["tell","telling","tells","told"],
+    answer: "told"
+  },
+  {
+    q: "He was supposed to …………. at 10:00.",
+    choices: ["come","comes","came","coming"],
+    answer: "come"
+  },
+  {
+    q: "This watch is ………. most expensive one.",
+    choices: ["a","an","the","no article"],
+    answer: "the"
+  },
+  {
+    q: "I have ………… of coins.",
+    choices: ["many","much","hardly","plenty"],
+    answer: "plenty"
+  },
+  {
+    q: "Before …………., call me.",
+    choices: ["leave","leaving","leaves","left"],
+    answer: "leaving"
+  },
+  {
+    q: "I cleaned my room while ……….. my friend.",
+    choices: ["call","called","calling","calls"],
+    answer: "calling"
+  },
+  {
+    q: "She was always ………. in my room so I had to lock it every time I leave.",
+    choices: ["play","plays","playing","played"],
+    answer: "playing"
+  },
+  {
+    q: "I was about to ………. when the phone rang.",
+    choices: ["sleep","sleeps","sleeping","slept"],
+    answer: "sleep"
+  },
+  {
+    q: "I am sure that you haven't eaten yet. — Is this sentence Correct or Incorrect?",
+    choices: ["Correct","Incorrect"],
+    answer: "Correct",
+    tf: true
+  },
+  {
+    q: "I am aware that you have ……….. about the meeting.",
+    choices: ["forgot","forget","forgotten","forgetting"],
+    answer: "forgotten"
+  },
+  {
+    q: "I had my phone …………. yesterday.",
+    choices: ["fix","fixes","fixing","fixed"],
+    answer: "fixed"
+  },
+  {
+    q: "I am having my room furnishing. — Is this sentence Correct or Incorrect?",
+    choices: ["Correct","Incorrect"],
+    answer: "Incorrect",
+    tf: true
+  },
+  {
+    q: "Students ……….. early for exams will get better marks.",
+    choices: ["prepare","prepared","preparing","prepares"],
+    answer: "preparing"
+  },
+  {
+    q: "The cake …… yesterday was delicious.",
+    choices: ["eat","ate","eating","eaten"],
+    answer: "eaten"
+  },
+  {
+    q: "She said that she ………. the show.",
+    choices: ["enjoys","enjoy","is enjoying","enjoyed"],
+    answer: "enjoyed"
+  },
+  {
+    q: "They said that they ……….. Math.",
+    choices: ["study","have studied","are studying","were studying"],
+    answer: "were studying"
+  },
+  {
+    q: "You had better ……….. early.",
+    choices: ["come","came","coming","comes"],
+    answer: "come"
+  },
+  {
+    q: "We ought not to miss your flight. — Is this sentence Correct or Incorrect?",
+    choices: ["Correct","Incorrect"],
+    answer: "Correct",
+    tf: true
+  },
+  {
+    q: "The actress ………. I like her movies is Emma Stone.",
+    choices: ["which","where","whom","when"],
+    answer: "whom"
+  },
+  {
+    q: "I know someone who travel twice a year. — Is this sentence Correct or Incorrect?",
+    choices: ["Correct","Incorrect"],
+    answer: "Incorrect",
+    tf: true
+  },
+  {
+    q: "Am I ………… play with them?",
+    choices: ["will","going to","going","able"],
+    answer: "going to"
+  },
+  {
+    q: "By next March, they will be taking the HR course. — Is this sentence Correct or Incorrect?",
+    choices: ["Correct","Incorrect"],
+    answer: "Correct",
+    tf: true
+  },
+  {
+    q: "If only the weather were sunny. — Is this sentence Correct or Incorrect?",
+    choices: ["Correct","Incorrect"],
+    answer: "Correct",
+    tf: true
+  },
+  {
+    q: "I wish my sister ………… me.",
+    choices: ["help","is helping","will help","would help"],
+    answer: "would help"
+  },
+  {
+    q: "I traveled to the country in which my brother studies. — Is this sentence Correct or Incorrect?",
+    choices: ["Correct","Incorrect"],
+    answer: "Correct",
+    tf: true
+  },
+  {
+    q: "He is the one ………. father owns the company.",
+    choices: ["who","whom","which","whose"],
+    answer: "whose"
+  },
+  {
+    q: "He acts as if he were the boss. — Is this sentence Correct or Incorrect?",
+    choices: ["Correct","Incorrect"],
+    answer: "Correct",
+    tf: true
+  },
+  {
+    q: "Never ……….. eaten a delicious sandwich like this.",
+    choices: ["have I eaten","I have eaten","I did eat","I ate"],
+    answer: "have I eaten"
+  },
+  {
+    q: "Not only did she talked to them but she also told their parents. — Is this sentence Correct or Incorrect?",
+    choices: ["Correct","Incorrect"],
+    answer: "Incorrect",
+    tf: true
+  }
+];
+
+let answered = 0, correct = 0, wrong = 0;
+const total = questions.length;
+
+function buildQuiz() {
+  const body = document.getElementById('quiz-body');
+  body.innerHTML = '';
+  answered = 0; correct = 0; wrong = 0;
+  updatePill();
+  updateProgress();
+
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = `card-${i}`;
+
+    const num = document.createElement('div');
+    num.className = 'q-num';
+    num.textContent = `Question ${i + 1} of ${total}`;
+
+    const qtext = document.createElement('div');
+    qtext.className = 'q-text';
+    qtext.textContent = q.q;
+
+    const choicesWrap = document.createElement('div');
+    choicesWrap.className = q.tf ? 'choices tf-wrap' : 'choices';
+
+    q.choices.forEach(ch => {
+      const label = document.createElement('label');
+      label.className = q.tf ? 'choice tf' : 'choice';
+      label.dataset.value = ch;
+
+      const inp = document.createElement('input');
+      inp.type = 'radio';
+      inp.name = `q${i}`;
+      inp.value = ch;
+
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+
+      const txt = document.createTextNode(ch);
+
+      label.appendChild(inp);
+      label.appendChild(dot);
+      label.appendChild(txt);
+
+      label.addEventListener('click', () => handleAnswer(i, ch, label, choicesWrap, feedback));
+      choicesWrap.appendChild(label);
+    });
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback';
+
+    card.appendChild(num);
+    card.appendChild(qtext);
+    card.appendChild(choicesWrap);
+    card.appendChild(feedback);
+    body.appendChild(card);
+  });
+
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('result-banner').style.display = 'none';
+}
+
+function handleAnswer(idx, chosen, label, wrap, feedback) {
+  if (wrap.dataset.done) return;
+  wrap.dataset.done = '1';
+
+  const q = questions[idx];
+  const isCorrect = chosen === q.answer;
+
+  // Mark all labels
+  wrap.querySelectorAll('label').forEach(l => {
+    if (l.dataset.value === q.answer) l.classList.add('correct-ans');
+    if (l.dataset.value === chosen && !isCorrect) l.classList.add('wrong-ans');
+    l.style.cursor = 'default';
+  });
+  label.classList.add('selected');
+
+  feedback.classList.add('show');
+  if (isCorrect) {
+    feedback.classList.add('ok');
+    feedback.innerHTML = '✓ Correct!';
+    correct++;
+  } else {
+    feedback.classList.add('bad');
+    feedback.innerHTML = `✗ Incorrect — the answer is <strong>${q.answer}</strong>`;
+    wrong++;
+  }
+
+  answered++;
+  updatePill();
+  updateProgress();
+
+  if (answered === total) {
+    document.getElementById('submit-btn').disabled = false;
+    document.getElementById('submit-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function updatePill() {
+  document.getElementById('ans-count').textContent = answered;
+  document.getElementById('correct-count').textContent = correct;
+  document.getElementById('wrong-count').textContent = wrong;
+}
+
+function updateProgress() {
+  document.getElementById('progress-bar').style.width = `${(answered / total) * 100}%`;
+}
+
+document.getElementById('submit-btn').addEventListener('click', () => {
+  const pct = Math.round((correct / total) * 100);
+  document.getElementById('final-score').textContent = `${correct} / ${total}`;
+  let msg, emoji;
+  if (pct === 100) { emoji = '🏆'; msg = 'Perfect score! You are absolutely amazing!'; }
+  else if (pct >= 80) { emoji = '🌟'; msg = `Fantastic work! You scored ${pct}% — keep shining!`; }
+  else if (pct >= 60) { emoji = '👍'; msg = `Good effort! You scored ${pct}%. A little more practice and you've got this!`; }
+  else { emoji = '📚'; msg = `You scored ${pct}%. Don't give up — review and try again, you can do it!`; }
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('final-msg').textContent = msg;
+  const banner = document.getElementById('result-banner');
+  banner.style.display = 'block';
+  banner.scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('submit-btn').style.display = 'none';
+});
+
+document.getElementById('retry-btn').addEventListener('click', () => {
+  document.getElementById('submit-btn').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  buildQuiz();
+});
+
+buildQuiz();
+</script>
+</body>
+</html>
